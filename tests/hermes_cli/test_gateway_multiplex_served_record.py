@@ -277,6 +277,18 @@ def test_dashboard_restart_targets_default_when_configured_host_is_stopped(serve
     assert _gateway_subcommand("coder", "restart") == ["-p", "coder", "gateway", "restart"]
 
 
+def test_dashboard_does_not_guess_an_unset_stopped_multiplex_verdict(served_root):
+    """An unset flag is a boot-time decision, not proof that a stopped host owned the satellite."""
+    from hermes_cli.web_server_gateway import _gateway_subcommand, multiplexed_profile_refusal
+
+    (served_root / "config.yaml").write_text("model: {default: x}\n")
+    (served_root / "gateway.pid").unlink()
+    (served_root / "gateway_state.json").unlink()
+
+    assert _gateway_subcommand("coder", "restart") == ["-p", "coder", "gateway", "restart"]
+    assert multiplexed_profile_refusal("coder", "start")
+
+
 def test_cli_stop_parks_when_host_control_socket_is_unavailable(served_root, monkeypatch):
     import hermes_cli.gateway as gw
     from gateway import control_socket

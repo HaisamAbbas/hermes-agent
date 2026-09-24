@@ -549,6 +549,9 @@ def _default_multiplexer_owns_profile(profile: str) -> bool:
     explicit/resolved multiplex flag is the remaining durable topology signal.
     Standalone, parked, live-own, and force-installed profiles are deliberately
     excluded so this fallback cannot steal their lifecycle from the default.
+    An unset multiplex flag is intentionally not resolved here: the gateway's
+    boot preflight, not a stopped dashboard reader, is the authority for that
+    verdict.
     """
     requested = (profile or "").strip()
     if not requested or requested.lower() in {"current", "default"}:
